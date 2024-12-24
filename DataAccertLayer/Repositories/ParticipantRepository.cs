@@ -1,32 +1,49 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using DataAccessLayer.Model;
+using DataAccessLayer.Model;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace DataAccessLayer.Model
+namespace DataAccessLayer.Repositories
 {
-    public class Participant
+    public class ParticipantRepository : IRepository<Participant>
     {
-        [Key]
-        public int Id { get; set; }
+        private readonly AppDbContext _context;
 
-        [Required]
-        [MaxLength(100)]
-        public string FullName { get; set; } = string.Empty; 
+        public ParticipantRepository(AppDbContext context)
+        {
+            _context = context;
+        }
 
-        [Required]
-        [MaxLength(50)]
-        public string Login { get; set; } = string.Empty; 
+        public IEnumerable<Participant> GetAll()
+        {
+            return _context.Participants.ToList();
+        }
 
-        [Required]
-        [MaxLength(50)]
-        public string Password { get; set; } = string.Empty; 
+        public Participant GetById(int id)
+        {
+            return _context.Participants.Find(id);
+        }
 
-        [Required]
-        [MaxLength(50)]
-        public string Position { get; set; } = string.Empty;
+        public void Add(Participant participant)
+        {
+            _context.Participants.Add(participant);
+            _context.SaveChanges();
+        }
 
-        public int ProjectId { get; set; }
+        public void Update(Participant participant)
+        {
+            _context.Participants.Update(participant);
+            _context.SaveChanges();
+        }
 
-        [ForeignKey("ProjectId")]
-        public Project? Project { get; set; } 
+        public void Delete(int id)
+        {
+            var participant = _context.Participants.Find(id);
+            if (participant != null)
+            {
+                _context.Participants.Remove(participant);
+                _context.SaveChanges();
+            }
+        }
     }
 }
